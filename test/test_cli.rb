@@ -227,17 +227,20 @@ class TestCli < Minitest::Test
 
   def test_ignore_front_matter
     path = File.expand_path('./fixtures/front_matter', File.dirname(__FILE__))
-    files = ['jekyll_post.md', 'jekyll_post_2.md'].map do |f|
+    files = ['jekyll_post.md', 'jekyll_post_2.md', 'jekyll_post_3.md'].map do |f|
       File.join(path, f)
     end.join(' ')
-    result = run_cli("-i -r MD001,MD041,MD034 #{files}")
+    result = run_cli("-i -r MD001,MD002,MD025,MD034,MD041 #{files}")
 
     expected = <<~OUTPUT
       #{path}/jekyll_post.md:16: MD001 Header levels should only increment by one level at a time
+      #{path}/jekyll_post.md:12: MD025 Multiple top level headers in the same document
       #{path}/jekyll_post_2.md:17: MD001 Header levels should only increment by one level at a time
+      #{path}/jekyll_post_2.md:13: MD025 Multiple top level headers in the same document
 
       Further documentation is available for these failures:
        - MD001: https://github.com/markdownlint/markdownlint/blob/main/docs/RULES.md#md001---header-levels-should-only-increment-by-one-level-at-a-time
+       - MD025: https://github.com/markdownlint/markdownlint/blob/main/docs/RULES.md#md025---multiple-top-level-headers-in-the-same-document
     OUTPUT
 
     assert_equal(result[:stdout], expected)
