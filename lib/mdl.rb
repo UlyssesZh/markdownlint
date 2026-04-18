@@ -95,7 +95,12 @@ module MarkdownLint
         text = original_text.dup
       end
 
-      doc = Doc.new_from_file(filename, Config[:ignore_front_matter])
+      kramdown_options = {
+        parse_block_html: Config[:parse_block_html],
+        parse_span_html: Config[:parse_span_html],
+        html_to_native: Config[:html_to_native]
+      }
+      doc = Doc.new_from_file(filename, Config[:ignore_front_matter], **kramdown_options)
       filename = '(stdin)' if filename == '-'
       if Config[:show_kramdown_warnings]
         status = 2 unless doc.parsed.warnings.empty?
@@ -113,7 +118,7 @@ module MarkdownLint
         if Config[:fix] && filename != '(stdin)' && rule.fix
           rule.fix.call(doc, error_lines)
           text = doc.to_s
-          doc = Doc.new(text.dup, Config[:ignore_front_matter])
+          doc = Doc.new(text.dup, Config[:ignore_front_matter], **kramdown_options)
           corrected = true
         end
 

@@ -26,7 +26,7 @@ module MarkdownLint
     ##
     # Create a new document given a string containing the markdown source
 
-    def initialize(text, ignore_front_matter = false)
+    def initialize(text, ignore_front_matter = false, **kramdown_options)
       regex = /\A---\n(.*?)---\n\n?/m
       if ignore_front_matter && regex.match(text)
         @front_matter = regex.match(text).to_s
@@ -39,7 +39,7 @@ module MarkdownLint
       # The -1 is to cause split to preserve an extra entry in the array so we
       # can tell if there's a final newline in the file or not.
       @lines = text.split(/\R/, -1)
-      @parsed = Kramdown::Document.new(text, :input => 'MarkdownLint')
+      @parsed = Kramdown::Document.new(text, input: 'MarkdownLint', **kramdown_options)
       @elements = @parsed.root.children
       add_annotations(@elements)
     end
@@ -47,13 +47,14 @@ module MarkdownLint
     ##
     # Alternate 'constructor' passing in a filename
 
-    def self.new_from_file(filename, ignore_front_matter = false)
+    def self.new_from_file(filename, ignore_front_matter = false, **kramdown_options)
       if filename == '-'
-        new($stdin.read.scrub, ignore_front_matter)
+        new($stdin.read.scrub, ignore_front_matter, **kramdown_options)
       else
         new(
           File.read(filename, :encoding => 'UTF-8').scrub,
           ignore_front_matter,
+          **kramdown_options
         )
       end
     end
