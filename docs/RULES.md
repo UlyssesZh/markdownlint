@@ -52,6 +52,8 @@ Tags: headers
 
 Aliases: header-increment
 
+Parameters: front_matter_title (regexp or `nil`; default `/^\s*title\s*[:=]/`)
+
 This rule is triggered when you skip header levels in a markdown document, for
 example:
 
@@ -80,13 +82,16 @@ level at a time:
 ### Another Header 3
 ```
 
+If the config `ignore_front_matter` is true and `front_matter_title` matches
+the front matter, then this rule treats it as a top level header.
+
 ## MD002 - First header should be a top level header
 
 Tags: headers
 
 Aliases: first-header-h1
 
-Parameters: level (number; default 1)
+Parameters: level, front_matter_title (number; default 1, regexp or nil; default `/^\s*title\s*[:=]/`)
 
 This rule is triggered when the first header in the document isn't a h1 header:
 
@@ -103,6 +108,9 @@ The first header in the document should be a h1 header:
 
 ## Then use a H2 for subsections
 ```
+
+If the config `ignore_front_matter` is true and `front_matter_title` matches
+the front matter, then this rule is not triggered.
 
 ## MD003 - Header style
 
@@ -691,7 +699,7 @@ Tags: headers
 
 Aliases: single-h1
 
-Parameters: level (number; default 1)
+Parameters: level, front_matter_title (number; default 1, regexp or nil; default `/^\s*title\s*[:=]/`)
 
 This rule is triggered when a top level header is in use (the first line of
 the file is a h1 header), and more than one h1 header is in use in the
@@ -714,6 +722,9 @@ headers:
 
 ## Another header
 ```
+
+If the config `ignore_front_matter` is true and `front_matter_title` matches
+the front matter, then this rule treats it as a top level header.
 
 Rationale: A top level header is a h1 on the first line of the file, and
 serves as the title for the document. If this convention is in use, then there
@@ -1239,7 +1250,7 @@ Tags: headers
 
 Aliases: first-line-h1
 
-Parameters: level (number; default 1)
+Parameters: level, front_matter_title (number; default 1, regexp or nil; default `/^\s*title\s*[:=]/`)
 
 This rule is triggered when the first line in the file isn't a top level (h1)
 header:
@@ -1255,6 +1266,9 @@ To fix this, add a header to the top of your file:
 
 This is a file with a top level header
 ```
+
+If the config `ignore_front_matter` is true and `front_matter_title` matches
+the front matter, then this rule is not triggered.
 
 Note: The `level` parameter can be used to change the top level (ex: to h2) in
 cases where an h1 is added externally.
