@@ -49,6 +49,35 @@ front matter to be the first line.
 * Config file: `ignore_front_matter true`
 * Default: false
 
+### Kramdown parser options
+
+Parse block HTML - If this option is enabled, the kramdown parser processes
+the content of block HTML tags as text containing block-level elements. See
+[`parse_block_html`](https://kramdown.gettalong.org/parser/kramdown.html#option-parse-block-html)
+in the documentation of kramdown.
+
+* Command line: `-b`, `--parse-block-html`
+* Config file: `parse_block_html true`
+* Default: false
+
+Parse span HTML - If this option is enabled, the kramdown parser processes
+the content of span HTML tags as text containing span-level elements. See
+[`parse_span_html`](https://kramdown.gettalong.org/parser/kramdown.html#option-parse-span-html)
+in the documentation of kramdown.
+
+* Command line: `-p`, `--parse-span-html`
+* Config file: `parse_span_html true`
+* Default: true
+
+HTML to native - If this option is enabled, the parser converts HTML elements
+to native elements. See
+[`html_to_native`](https://kramdown.gettalong.org/parser/kramdown.html#option-html-to-native)
+in the documentation of kramdown.
+
+* Command line: `-n`, `--html-to-native`
+* Config file: `html_to_native true`
+* Default: false
+
 ### Specifying which rules mdl processes
 
 Tags - Limit the rules mdl enables to those containing the provided tags.

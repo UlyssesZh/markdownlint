@@ -29,11 +29,30 @@ module MarkdownLint
            :description => 'Increase verbosity',
            :boolean => true
 
+    option :html_to_native,
+           :short => '-n',
+           :long => '--[no-]html-to-native',
+           :boolean => true,
+           :description => 'Convert HTML elements to native elements'
+
     option :ignore_front_matter,
            :short => '-i',
            :long => '--[no-]ignore-front-matter',
            :boolean => true,
            :description => 'Ignore YAML front matter'
+
+    option :parse_block_html,
+           :short => '-b',
+           :long => '--[no-]parse-block-html',
+           :boolean => true,
+           :description => 'Process kramdown syntax in block HTML tags'
+
+    option :parse_span_html,
+           :short => '-p',
+           :long => '--[no-]parse-span-html',
+           :boolean => true,
+           :default => true,
+           :description => 'Process kramdown syntax in span HTML tags'
 
     option :show_kramdown_warnings,
            :short => '-w',
