@@ -49,6 +49,13 @@ front matter to be the first line.
 * Config file: `ignore_front_matter true`
 * Default: false
 
+Ignore block comments - If this option is enabled markdownlint will ignore
+XML comment blocks. Note that XML comment spans are not ignored.
+
+* Command line: `-x`, `--ignore-block-comments`
+* Config file: `ignore_block_comments true`
+* Default: false
+
 ### Specifying which rules mdl processes
 
 Tags - Limit the rules mdl enables to those containing the provided tags.

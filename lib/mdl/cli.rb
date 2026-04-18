@@ -29,6 +29,12 @@ module MarkdownLint
            :description => 'Increase verbosity',
            :boolean => true
 
+    option :ignore_block_comments,
+           :short => '-x',
+           :long => '--[no-]ignore-block-comments',
+           :description => 'Ignore block comments',
+           :boolean => true
+
     option :ignore_front_matter,
            :short => '-i',
            :long => '--[no-]ignore-front-matter',

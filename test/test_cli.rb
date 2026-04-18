@@ -243,6 +243,20 @@ class TestCli < Minitest::Test
     assert_equal(result[:stdout], expected)
   end
 
+  def test_ignore_block_comments
+    file = File.expand_path('./fixtures/block_comments.md', File.dirname(__FILE__))
+    result = run_cli("-x #{file}")
+
+    expected = <<~OUTPUT
+      #{file}:20: MD012 Multiple consecutive blank lines
+      #{file}:22: MD012 Multiple consecutive blank lines
+      #{file}:13: MD014 Line length
+      #{file}:16: MD017 Line length
+    OUTPUT
+
+    assert_equal(result[:stdout], expected)
+  end
+
   def test_unprintable_chars
     path = File.expand_path(
       './fixtures/unprintable_chars',

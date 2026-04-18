@@ -11,7 +11,7 @@ module MarkdownLint
     # subtract 1 from a line number to get the correct line. The element_line*
     # methods take care of this for you.
 
-    attr_reader :lines, :parsed, :elements, :offset, :front_matter
+    attr_reader :lines, :parsed, :elements, :offset, :front_matter, :offsets
 
     ##
     # A Kramdown::Document object containing the parsed markdown document.
@@ -24,9 +24,15 @@ module MarkdownLint
     # markdown file contains YAML front matter that should be ignored.
 
     ##
+    # The front matter if ignore_front_matter is enabled
+
+    ##
+    # The line offsets due to ignoring block comments
+
+    ##
     # Create a new document given a string containing the markdown source
 
-    def initialize(text, ignore_front_matter = false)
+    def initialize(text, ignore_front_matter = false, ignore_block_comments = false)
       regex = /\A---\n(.*?)---\n\n?/m
       if ignore_front_matter && regex.match(text)
         @front_matter = regex.match(text).to_s
@@ -40,6 +46,7 @@ module MarkdownLint
       # can tell if there's a final newline in the file or not.
       @lines = text.split(/\R/, -1)
       @parsed = Kramdown::Document.new(text, :input => 'MarkdownLint')
+      remove_block_comments if ignore_block_comments
       @elements = @parsed.root.children
       add_annotations(@elements)
     end
@@ -47,13 +54,14 @@ module MarkdownLint
     ##
     # Alternate 'constructor' passing in a filename
 
-    def self.new_from_file(filename, ignore_front_matter = false)
+    def self.new_from_file(filename, ignore_front_matter = false, ignore_block_comments = false)
       if filename == '-'
-        new($stdin.read.scrub, ignore_front_matter)
+        new($stdin.read.scrub, ignore_front_matter, ignore_block_comments)
       else
         new(
           File.read(filename, :encoding => 'UTF-8').scrub,
           ignore_front_matter,
+          ignore_block_comments,
         )
       end
     end
@@ -305,6 +313,29 @@ module MarkdownLint
     end
 
     private
+
+    ##
+    # If there are XML comment blocks, remove them and parse again.
+
+    def remove_block_comments
+      is_block_comment = ->e { e.type == :xml_comment && e.options[:category] == :block }
+      return if @parsed.root.children.none? &is_block_comment
+      removed_lines = Set.new
+      @parsed.root.children.each do |element|
+        next unless is_block_comment.call element
+        index = element.options[:location] - 1
+        removed_lines.merge(index..index + element.value.count("\n"))
+      end
+      offset = 0
+      @offsets = Array.new(@lines.size - removed_lines.size) do |i|
+        offset += 1 while removed_lines.include?(i + offset)
+        offset
+      end
+      @lines = @offsets.map.with_index { |offset, i| @lines[i + offset] }
+      puts @lines
+      p removed_lines
+      @parsed = Kramdown::Document.new(@lines.join("\n"), :input => 'MarkdownLint')
+    end
 
     ##
     # Adds a 'level' and 'parent' option to all elements to show how nested they
