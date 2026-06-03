@@ -7,9 +7,12 @@ end
 rule 'MD001', 'Header levels should only increment by one level at a time' do
   tags :headers
   aliases 'header-increment'
+  params :front_matter_title => /^\s*title\s*[:=]/
   check do |doc|
     headers = doc.find_type(:header)
-    old_level = nil
+    has = params[:front_matter_title]
+    has &&= doc.front_matter.match(params[:front_matter_title])
+    old_level = 1 if has
     errors = []
     headers.each do |h|
       errors << h[:location] if old_level && (h[:level] > old_level + 1)
@@ -22,8 +25,12 @@ end
 rule 'MD002', 'First header should be a top level header' do
   tags :headers
   aliases 'first-header-h1'
-  params :level => 1
+  params :level => 1, :front_matter_title => /^\s*title\s*[:=]/
   check do |doc|
+    has = params[:front_matter_title]
+    has &&= doc.front_matter.match(params[:front_matter_title])
+    next [] if has
+
     first_header = doc.find_type(:header).first
     if first_header && (first_header[:level] != @params[:level])
       [first_header[:location]]
@@ -503,13 +510,16 @@ end
 rule 'MD025', 'Multiple top level headers in the same document' do
   tags :headers
   aliases 'single-h1'
-  params :level => 1
+  params :level => 1, :front_matter_title => /^\s*title\s*[:=]/
   check do |doc|
     headers = doc.find_type(:header, false).select do |h|
       h[:level] == params[:level]
     end
-    if !headers.empty? && (doc.element_linenumber(headers[0]) == 1)
-      headers[1..].map { |h| doc.element_linenumber(h) }
+    has = params[:front_matter_title]
+    has &&= doc.front_matter.match(params[:front_matter_title])
+    if !headers.empty? && (doc.element_linenumber(headers[0]) == 1 || has)
+      headers = headers[1..] unless has
+      headers.map { |h| doc.element_linenumber(h) }
     end
   end
 end
@@ -883,11 +893,14 @@ end
 rule 'MD041', 'First line in file should be a top level header' do
   tags :headers
   aliases 'first-line-h1'
-  params :level => 1
+  params :level => 1, :front_matter_title => /^\s*title\s*[:=]/
   check do |doc|
     first_header = doc.find_type(:header).first
-    [1] if first_header.nil? || (first_header[:location] != 1) \
-      || (first_header[:level] != params[:level])
+    first = first_header.nil? || (first_header[:location] != 1)
+    first ||= first_header[:level] != params[:level]
+    has = params[:front_matter_title]
+    has &&= doc.front_matter.match(params[:front_matter_title])
+    [1] if first && !has
   end
 end
 
